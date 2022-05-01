@@ -24,6 +24,8 @@ func InitializeConfig() *Config {
 		panic(fmt.Errorf("fatal error reading config file: %w", err))
 	}
 
+	fmt.Println("Config Initialized")
+
 	return c
 
 }
