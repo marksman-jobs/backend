@@ -7,3 +7,9 @@ type CandidateService interface {
 	Get(candidateId string) (response model.GetCandidateResponse, err error)
 	Create(requestBody []byte) (response model.CreateCandidateResponse, err error)
 }
+
+type CompanyService interface {
+	List() (responses []model.GetCompanyResponse, err error)
+	Get(candidateId string) (response model.GetCompanyResponse, err error)
+	Create(requestBody []byte) (response model.CreateCompanyResponse, err error)
+}

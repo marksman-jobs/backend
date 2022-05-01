@@ -7,3 +7,9 @@ type CandidateRepository interface {
 	FindAll() ([]entity.Candidate, error)
 	Get(candidate entity.Candidate) (entity.Candidate, error)
 }
+
+type CompanyRepository interface {
+	Insert(company entity.Company) error
+	FindAll() ([]entity.Company, error)
+	Get(company entity.Company) (entity.Company, error)
+}
