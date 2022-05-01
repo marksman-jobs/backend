@@ -40,10 +40,14 @@ func (repository *candidateRepositoryImpl) FindAll() ([]entity.Candidate, error)
 	defer cancel()
 
 	response := []entity.Candidate{}
-	_, err := repository.collection.Find(ctx, response)
-
+	cursor, err := repository.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return []entity.Candidate{}, err
+	}
+
+	err = cursor.All(ctx, response)
+	if err != nil {
+		return []entity.Candidate{}, nil
 	}
 
 	return response, nil
