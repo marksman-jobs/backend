@@ -9,19 +9,19 @@ import (
 )
 
 type candidateServiceImpl struct {
-	CandidateRespository repository.CandidateRepository
+	candidateRepository repository.CandidateRepository
 }
 
 func NewCandidateService(candidateRepository *repository.CandidateRepository) CandidateService {
 	return &candidateServiceImpl{
-		CandidateRespository: *candidateRepository,
+		candidateRepository: *candidateRepository,
 	}
 }
 
 func (service *candidateServiceImpl) List() (responses []model.GetCandidateResponse, err error) {
 
-	// candidates, err := service.CandidateRespository.FindAll()
-	_, err = service.CandidateRespository.FindAll()
+	// candidates, err := service.candidateRepository.FindAll()
+	_, err = service.candidateRepository.FindAll()
 
 	if err != nil {
 		return []model.GetCandidateResponse{}, err
@@ -43,8 +43,8 @@ func (service *candidateServiceImpl) List() (responses []model.GetCandidateRespo
 func (service *candidateServiceImpl) Get(candidateId string) (response model.GetCandidateResponse, err error) {
 
 	request := entity.Candidate{}
-	// request, err = service.CandidateRespository.Get(request)
-	_, err = service.CandidateRespository.Get(request)
+	// request, err = service.candidateRepository.Get(request)
+	_, err = service.candidateRepository.Get(request)
 
 	if err != nil {
 		return model.GetCandidateResponse{}, err
@@ -69,7 +69,7 @@ func (service *candidateServiceImpl) Create(requestBody []byte) (response model.
 
 	// TODO: Unmarshal request values into candidate
 
-	service.CandidateRespository.Insert(*candidate)
+	service.candidateRepository.Insert(*candidate)
 
 	return model.CreateCandidateResponse{}, nil
 
