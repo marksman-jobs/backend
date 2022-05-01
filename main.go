@@ -8,9 +8,17 @@ import (
 )
 
 func main() {
+
 	fmt.Println("Welcome to Marksman.com - Backend")
 	fmt.Println("Starting processes...")
 
 	conf := config.InitializeConfig()
-	controller.InitializeServer(conf)
+
+	db, err := config.InitializeDatabase(*conf)
+	if err != nil {
+		panic(fmt.Errorf(err.Error()))
+	}
+
+	controller.InitializeServer(conf, db)
+
 }

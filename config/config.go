@@ -7,11 +7,15 @@ import (
 )
 
 type Config struct {
-	// TODO: Add config variables here
+	MONGO_POOL_MIN             int
+	MONGO_POOL_MAX             int
+	MONGO_MAX_IDLE_TIME_SECOND int
+	MONGO_DATABASE             string
+	MONGO_URI                  string
 }
 
 func InitializeConfig() *Config {
-	
+
 	fmt.Println("Initialize Config")
 
 	viper.SetConfigName("config")
