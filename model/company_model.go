@@ -1,17 +1,19 @@
 package model
 
 type CreateCompanyRequest struct {
-	// TODO: Add company details here
+	LocationIds        []string `bun:"location_ids,fk,array"`
+	CompanyDescription string   `bun:"company_description,type:text"`
 }
 
 type CreateCompanyResponse struct {
-	// TODO: Add response details here
+	CompanyId string `bun:"company_id,pk"`
 }
 
 type GetCompanyRequest struct {
-	// TODO: Add company details here
+	CompanyId string `bun:"company_id,pk"`
 }
 
 type GetCompanyResponse struct {
-	// TODO: Add response details here
+	LocationIds        []string `bun:"location_ids,fk,array"`
+	CompanyDescription string   `bun:"company_description,type:text"`
 }

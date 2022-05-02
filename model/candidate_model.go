@@ -1,17 +1,42 @@
 package model
 
 type CreateCandidateRequest struct {
-	// TODO: Add candidate details here
+	FirstName          string
+	LastName           string
+	CurrentCompanyId   string
+	CurrentRoleId      string
+	CurrentLocationId  string
+	DesiredLocationIds []string
+	DesiredRoleId      string
+	Email              string
+	PasswordHash       string
+	Pronouns           int
+	EducationId        string
+	SkillsId           string
+	ResumeId           string
 }
 
 type CreateCandidateResponse struct {
-	// TODO: Add response details here
+	CandidateId string
 }
 
 type GetCandidateRequest struct {
-	// TODO: Add candidate details here
+	CandidateId string
 }
 
 type GetCandidateResponse struct {
-	// TODO: Add candidate details here
+	FirstName          string
+	LastName           string
+	CurrentCompanyId   string
+	CurrentRoleId      string
+	CurrentLocationId  string
+	DesiredLocationIds []string
+	DesiredRoleId      string
+	Email              string
+	PasswordHash       string
+	IsEmailVerified    bool
+	Pronouns           int
+	EducationId        string
+	SkillsId           string
+	ResumeId           string
 }

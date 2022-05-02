@@ -12,6 +12,7 @@ type Config struct {
 	MONGO_MAX_IDLE_TIME_SECOND int
 	MONGO_DATABASE             string
 	MONGO_URI                  string
+	POSTGRES_URI               string
 }
 
 func InitializeConfig() *Config {

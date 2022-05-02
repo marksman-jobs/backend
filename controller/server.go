@@ -11,11 +11,11 @@ import (
 
 func InitializeServer(conf *config.Config, db *config.Databases) {
 
-	candidateRepository := repository.NewCandidateRepository(db.Mongo)
+	candidateRepository := repository.NewCandidateRepository(db.Postgres)
 	candidateService := service.NewCandidateService(&candidateRepository)
 	candidateController := NewCandidateController(&candidateService)
 
-	companyRepository := repository.NewCompanyRepository(db.Mongo)
+	companyRepository := repository.NewCompanyRepository(db.Postgres)
 	companyService := service.NewCompanyService(&companyRepository)
 	companyController := NewCompanyController(&companyService)
 

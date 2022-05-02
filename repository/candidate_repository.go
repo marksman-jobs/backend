@@ -4,18 +4,17 @@ import (
 	"context"
 	"time"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/marksman-jobs/backend/entity"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type candidateRepositoryImpl struct {
-	collection *mongo.Collection
+	pgconn *pgxpool.Pool
 }
 
-func NewCandidateRepository(database *mongo.Database) CandidateRepository {
+func NewCandidateRepository(connPool *pgxpool.Pool) CandidateRepository {
 	return &candidateRepositoryImpl{
-		collection: database.Collection("candidates"),
+		pgconn: connPool,
 	}
 }
 
@@ -24,7 +23,8 @@ func (repository *candidateRepositoryImpl) Insert(candidate entity.Candidate) er
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := repository.collection.InsertOne(ctx, bson.M{})
+	// TODO: Write query to insert candidate here
+	_, err := repository.pgconn.Query(ctx, "INSERT INTO candidates ")
 
 	if err != nil {
 		return err
@@ -40,14 +40,20 @@ func (repository *candidateRepositoryImpl) FindAll() ([]entity.Candidate, error)
 	defer cancel()
 
 	response := []entity.Candidate{}
-	cursor, err := repository.collection.Find(ctx, bson.M{})
+	rows, err := repository.pgconn.Query(ctx, "SELECT * FROM candidates")
 	if err != nil {
 		return []entity.Candidate{}, err
 	}
 
-	err = cursor.All(ctx, response)
-	if err != nil {
-		return []entity.Candidate{}, nil
+	for rows.Next() {
+		res := entity.Candidate{}
+		err = rows.Scan(res)
+
+		if err != nil {
+			return []entity.Candidate{}, err
+		}
+
+		response = append(response, res)
 	}
 
 	return response, nil
@@ -59,12 +65,10 @@ func (repository *candidateRepositoryImpl) Get(candidate entity.Candidate) (enti
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result := repository.collection.FindOne(ctx, &candidate)
+	row := repository.pgconn.QueryRow(ctx, "SELECT * FROM candidates WHERE candidate_id = $1", candidate.CandidateId)
 
 	response := entity.Candidate{}
-	err := result.Decode(&response)
-
-	if err != nil {
+	if err := row.Scan(response); err != nil {
 		return entity.Candidate{}, err
 	}
 

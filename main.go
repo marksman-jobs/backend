@@ -21,4 +21,6 @@ func main() {
 
 	controller.InitializeServer(conf, db)
 
+	// TODO: Add graceful shutdown here
+
 }
