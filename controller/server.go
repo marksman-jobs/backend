@@ -7,16 +7,15 @@ import (
 	"github.com/marksman-jobs/backend/config"
 	"github.com/marksman-jobs/backend/repository"
 	"github.com/marksman-jobs/backend/service"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func InitializeServer(conf *config.Config, db *mongo.Database) {
+func InitializeServer(conf *config.Config, db *config.Databases) {
 
-	candidateRepository := repository.NewCandidateRepository(db)
+	candidateRepository := repository.NewCandidateRepository(db.Mongo)
 	candidateService := service.NewCandidateService(&candidateRepository)
 	candidateController := NewCandidateController(&candidateService)
 
-	companyRepository := repository.NewCompanyRepository(db)
+	companyRepository := repository.NewCompanyRepository(db.Mongo)
 	companyService := service.NewCompanyService(&companyRepository)
 	companyController := NewCompanyController(&companyService)
 
