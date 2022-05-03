@@ -18,19 +18,19 @@ func NewCompanyRepository(connPool *pgxpool.Pool) CompanyRepository {
 	}
 }
 
-func (repository *companyRepositoryImpl) Insert(company entity.Company) error {
+func (repository *companyRepositoryImpl) Insert(company entity.Company) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// TODO: Add query to insert company here
-	_, err := repository.pgconn.Query(ctx, "")
-
+	row := repository.pgconn.QueryRow(ctx, "")
+	err := row.Scan(company)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return company.CompanyId, nil
 
 }
 

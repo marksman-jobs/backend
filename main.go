@@ -5,6 +5,7 @@ import (
 
 	"github.com/marksman-jobs/backend/config"
 	"github.com/marksman-jobs/backend/controller"
+	"github.com/marksman-jobs/backend/validation"
 )
 
 func main() {
@@ -13,6 +14,9 @@ func main() {
 	fmt.Println("Starting processes...")
 
 	conf := config.InitializeConfig()
+	if validation.ValidateConfig(conf) {
+		panic(fmt.Errorf("missing field(s) in config"))
+	}
 
 	db, err := config.InitializeDatabase(*conf)
 	if err != nil {

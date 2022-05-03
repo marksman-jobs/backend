@@ -1,11 +1,12 @@
 package service
 
 import (
+	"encoding/json"
+
 	"github.com/marksman-jobs/backend/entity"
 	"github.com/marksman-jobs/backend/model"
 	"github.com/marksman-jobs/backend/repository"
 	"github.com/marksman-jobs/backend/validation"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type candidateServiceImpl struct {
@@ -20,8 +21,7 @@ func NewCandidateService(candidateRepository *repository.CandidateRepository) Ca
 
 func (service *candidateServiceImpl) List() (responses []model.GetCandidateResponse, err error) {
 
-	// candidates, err := service.candidateRepository.FindAll()
-	_, err = service.candidateRepository.FindAll()
+	candidates, err := service.candidateRepository.FindAll()
 
 	if err != nil {
 		return []model.GetCandidateResponse{}, err
@@ -29,29 +29,53 @@ func (service *candidateServiceImpl) List() (responses []model.GetCandidateRespo
 
 	response := []model.GetCandidateResponse{}
 
-	// TODO: Unmarshal candidate values into response
-
-	// for _, candidate := range candidates {
-	// 	response = append(response, model.GetCandidateResponse{
-	// 		candidate.id,
-	// 	})
-	// }
+	for _, candidate := range candidates {
+		response = append(response, model.GetCandidateResponse{
+			FirstName:          candidate.FirstName,
+			LastName:           candidate.LastName,
+			CurrentCompanyId:   candidate.CurrentCompanyId,
+			CurrentRoleId:      candidate.CurrentRoleId,
+			CurrentLocationId:  candidate.CurrentLocationId,
+			DesiredLocationIds: candidate.DesiredLocationIds,
+			DesiredRoleId:      candidate.DesiredRoleId,
+			Email:              candidate.Email,
+			PasswordHash:       candidate.PasswordHash,
+			IsEmailVerified:    candidate.IsEmailVerified,
+			Pronouns:           candidate.Pronouns,
+			EducationId:        candidate.EducationId,
+			SkillsId:           candidate.SkillsId,
+			ResumeId:           candidate.ResumeId,
+		})
+	}
 
 	return response, nil
 }
 
 func (service *candidateServiceImpl) Get(candidateId string) (response model.GetCandidateResponse, err error) {
 
-	request := entity.Candidate{}
-	// request, err = service.candidateRepository.Get(request)
-	_, err = service.candidateRepository.Get(request)
+	request := entity.Candidate{CandidateId: candidateId}
 
+	data, err := service.candidateRepository.Get(request)
 	if err != nil {
 		return model.GetCandidateResponse{}, err
 	}
 
-	// TODO: Unmarshal request into model.GetCandidateResponse
-
+	response = model.GetCandidateResponse{
+		FirstName:          data.FirstName,
+		LastName:           data.LastName,
+		CurrentCompanyId:   data.CurrentCompanyId,
+		CurrentRoleId:      data.CurrentRoleId,
+		CurrentLocationId:  data.CurrentLocationId,
+		DesiredLocationIds: data.DesiredLocationIds,
+		DesiredRoleId:      data.DesiredRoleId,
+		Email:              data.Email,
+		PasswordHash:       data.PasswordHash,
+		IsEmailVerified:    data.IsEmailVerified,
+		Pronouns:           data.Pronouns,
+		EducationId:        data.EducationId,
+		SkillsId:           data.SkillsId,
+		ResumeId:           data.ResumeId,
+	}
 	return model.GetCandidateResponse{}, nil
 
 }
@@ -59,18 +83,33 @@ func (service *candidateServiceImpl) Get(candidateId string) (response model.Get
 func (service *candidateServiceImpl) Create(requestBody []byte) (response model.CreateCandidateResponse, err error) {
 
 	request := &model.CreateCandidateRequest{}
-	bson.Unmarshal(requestBody, request)
+	json.Unmarshal(requestBody, request)
 
 	if err := validation.CandidateCreateValidation(*request); err != nil {
 		return model.CreateCandidateResponse{}, err
 	}
 
-	candidate := &entity.Candidate{}
+	candidate := entity.Candidate{
+		FirstName:          request.FirstName,
+		LastName:           request.LastName,
+		CurrentCompanyId:   request.CurrentCompanyId,
+		CurrentRoleId:      request.CurrentRoleId,
+		CurrentLocationId:  request.CurrentLocationId,
+		DesiredLocationIds: request.DesiredLocationIds,
+		DesiredRoleId:      request.DesiredRoleId,
+		Email:              request.Email,
+		PasswordHash:       request.PasswordHash,
+		Pronouns:           request.Pronouns,
+		EducationId:        request.EducationId,
+		SkillsId:           request.SkillsId,
+		ResumeId:           request.ResumeId,
+	}
 
-	// TODO: Unmarshal request values into candidate
+	candidateId, err := service.candidateRepository.Insert(candidate)
+	if err != nil {
+		return model.CreateCandidateResponse{}, err
+	}
 
-	service.candidateRepository.Insert(*candidate)
-
-	return model.CreateCandidateResponse{}, nil
+	return model.CreateCandidateResponse{CandidateId: candidateId}, nil
 
 }

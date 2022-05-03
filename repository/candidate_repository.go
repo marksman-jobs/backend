@@ -18,19 +18,20 @@ func NewCandidateRepository(connPool *pgxpool.Pool) CandidateRepository {
 	}
 }
 
-func (repository *candidateRepositoryImpl) Insert(candidate entity.Candidate) error {
+func (repository *candidateRepositoryImpl) Insert(candidate entity.Candidate) (string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// TODO: Write query to insert candidate here
-	_, err := repository.pgconn.Query(ctx, "INSERT INTO candidates ")
+	row := repository.pgconn.QueryRow(ctx, "INSERT INTO candidates ")
 
-	if err != nil {
-		return err
+	inserted := entity.Candidate{}
+	if err := row.Scan(inserted); err != nil {
+		return "", err
 	}
 
-	return nil
+	return inserted.CandidateId, nil
 
 }
 

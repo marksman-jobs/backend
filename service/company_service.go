@@ -20,8 +20,7 @@ func NewCompanyService(companyRepository *repository.CompanyRepository) CompanyS
 
 func (service *companyServiceImpl) List() (responses []model.GetCompanyResponse, err error) {
 
-	// companies, err := service.companyRepository.FindAll()
-	_, err = service.companyRepository.FindAll()
+	companies, err := service.companyRepository.FindAll()
 
 	if err != nil {
 		return []model.GetCompanyResponse{}, err
@@ -29,13 +28,13 @@ func (service *companyServiceImpl) List() (responses []model.GetCompanyResponse,
 
 	response := []model.GetCompanyResponse{}
 
-	// TODO: Unmarshal company values into response
-
-	// for _, company := range companies {
-	// 	response = append(response, model.GetCompanyResponse{
-	// 		company.id,
-	// 	})
-	// }
+	for _, company := range companies {
+		response = append(response, model.GetCompanyResponse{
+			CompanyId:          company.CompanyId,
+			LocationIds:        company.LocationIds,
+			CompanyDescription: company.CompanyDescription,
+		})
+	}
 
 	return response, nil
 
@@ -43,19 +42,20 @@ func (service *companyServiceImpl) List() (responses []model.GetCompanyResponse,
 
 func (service *companyServiceImpl) Get(companyId string) (response model.GetCompanyResponse, err error) {
 
-	request := entity.Company{}
-	// request := entity.Company{
-	// 	company.Id: companyId
-	// }
-	// request, err := service.companyRepository.Get(request)
+	request := entity.Company{
+		CompanyId: companyId,
+	}
 
-	_, err = service.companyRepository.Get(request)
-
+	request, err = service.companyRepository.Get(request)
 	if err != nil {
 		return model.GetCompanyResponse{}, nil
 	}
 
-	// TODO: Unmarshal request into model.GetCompanyResponse
+	response = model.GetCompanyResponse{
+		CompanyId:          request.CompanyId,
+		LocationIds:        request.LocationIds,
+		CompanyDescription: request.CompanyDescription,
+	}
 
 	return model.GetCompanyResponse{}, nil
 
@@ -70,12 +70,16 @@ func (service *companyServiceImpl) Create(requestBody []byte) (response model.Cr
 		return model.CreateCompanyResponse{}, err
 	}
 
-	company := &entity.Company{}
+	company := entity.Company{
+		LocationIds:        request.LocationIds,
+		CompanyDescription: request.CompanyDescription,
+	}
 
-	// TODO: Unmarshal request values into candidate
+	companyId, err := service.companyRepository.Insert(company)
+	if err != nil {
+		return model.CreateCompanyResponse{}, err
+	}
 
-	service.companyRepository.Insert(*company)
-
-	return model.CreateCompanyResponse{}, nil
+	return model.CreateCompanyResponse{CompanyId: companyId}, nil
 
 }
