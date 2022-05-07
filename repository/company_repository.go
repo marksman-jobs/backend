@@ -42,7 +42,7 @@ func (repository *companyRepositoryImpl) FindAll() ([]entity.Company, error) {
 	response := []entity.Company{}
 	rows, err := repository.pgconn.Query(ctx, "SELECT * FROM companies")
 	if err != nil {
-		return []entity.Company{}, err
+		return response, err
 	}
 
 	for rows.Next() {

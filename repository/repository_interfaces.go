@@ -13,3 +13,9 @@ type CompanyRepository interface {
 	FindAll() ([]entity.Company, error)
 	Get(company entity.Company) (entity.Company, error)
 }
+
+type JobRepository interface {
+	Insert(job entity.Job) (string, error)
+	FindAll() ([]entity.Job, error)
+	Get(job entity.Job) (entity.Job, error)
+}

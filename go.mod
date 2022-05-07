@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/gofiber/fiber/v2 v2.32.0
 	github.com/jackc/pgx/v4 v4.16.0
+	github.com/lib/pq v1.10.2
 	github.com/spf13/viper v1.11.0
 	go.mongodb.org/mongo-driver v1.9.0
 )

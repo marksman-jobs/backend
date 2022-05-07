@@ -10,6 +10,12 @@ type CandidateService interface {
 
 type CompanyService interface {
 	List() (responses []model.GetCompanyResponse, err error)
-	Get(candidateId string) (response model.GetCompanyResponse, err error)
+	Get(companyId string) (response model.GetCompanyResponse, err error)
 	Create(requestBody []byte) (response model.CreateCompanyResponse, err error)
+}
+
+type JobService interface {
+	List() (responses []model.GetJobResponse, err error)
+	Get(jobId string) (response model.GetJobResponse, err error)
+	Create(requestBody []byte) (response model.CreateJobResponse, err error)
 }

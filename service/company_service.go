@@ -1,11 +1,12 @@
 package service
 
 import (
+	"encoding/json"
+
 	"github.com/marksman-jobs/backend/entity"
 	"github.com/marksman-jobs/backend/model"
 	"github.com/marksman-jobs/backend/repository"
 	"github.com/marksman-jobs/backend/validation"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type companyServiceImpl struct {
@@ -57,14 +58,14 @@ func (service *companyServiceImpl) Get(companyId string) (response model.GetComp
 		CompanyDescription: request.CompanyDescription,
 	}
 
-	return model.GetCompanyResponse{}, nil
+	return response, nil
 
 }
 
 func (service *companyServiceImpl) Create(requestBody []byte) (response model.CreateCompanyResponse, err error) {
 
 	request := &model.CreateCompanyRequest{}
-	bson.Unmarshal(requestBody, request)
+	json.Unmarshal(requestBody, request)
 
 	if err := validation.CompanyCreateValidation(*request); err != nil {
 		return model.CreateCompanyResponse{}, err
