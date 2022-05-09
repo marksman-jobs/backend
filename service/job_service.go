@@ -1,112 +1,50 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 
-	"github.com/marksman-jobs/backend/entity"
-	"github.com/marksman-jobs/backend/model"
-	"github.com/marksman-jobs/backend/repository"
+	"github.com/marksman-jobs/backend/db"
 	"github.com/marksman-jobs/backend/validation"
 )
 
-type jobServiceImpl struct {
-	jobRepository repository.JobRepository
-}
+func (service *ServiceImpl) JobList() (responses []db.Job, err error) {
 
-func NewJobService(jobRepository *repository.JobRepository) JobService {
-	return &jobServiceImpl{
-		jobRepository: *jobRepository,
-	}
-}
+	jobs, err := service.postgres.ListJobs(context.Background())
 
-func (service *jobServiceImpl) List() (responses []model.GetJobResponse, err error) {
-
-	jobs, err := service.jobRepository.FindAll()
 	if err != nil {
-		return []model.GetJobResponse{}, err
+		return []db.Job{}, err
 	}
 
-	response := []model.GetJobResponse{}
-
-	for _, job := range jobs {
-		response = append(response, model.GetJobResponse{
-			JobId:             job.JobId,
-			JobTitle:          job.JobTitle,
-			JobType:           job.JobType,
-			JobFunction:       job.JobFunction,
-			Currency:          job.Currency,
-			Value:             job.Value,
-			SkillsId:          job.SkillsId,
-			JobApplicantIds:   job.JobApplicantIds,
-			JobApplicantCount: job.JobApplicantCount,
-			CompanyId:         job.CompanyId,
-			RecruiterId:       job.RecruiterId,
-			LocationId:        job.LocationId,
-		})
-	}
-
-	return response, nil
-
+	return jobs, nil
 }
 
-func (service *jobServiceImpl) Get(jobId string) (response model.GetJobResponse, err error) {
+func (service *ServiceImpl) JobGet(candidateId string) (response db.Job, err error) {
 
-	request := entity.Job{
-		JobId: jobId,
-	}
-
-	job, err := service.jobRepository.Get(request)
+	job, err := service.postgres.GetJob(context.Background(), candidateId)
 	if err != nil {
-		return model.GetJobResponse{}, err
+		return db.Job{}, err
 	}
 
-	response = model.GetJobResponse{
-		JobId:             job.JobId,
-		JobTitle:          job.JobTitle,
-		JobType:           job.JobType,
-		JobFunction:       job.JobFunction,
-		Currency:          job.Currency,
-		Value:             job.Value,
-		SkillsId:          job.SkillsId,
-		JobApplicantIds:   job.JobApplicantIds,
-		JobApplicantCount: job.JobApplicantCount,
-		CompanyId:         job.CompanyId,
-		RecruiterId:       job.RecruiterId,
-		LocationId:        job.LocationId,
-	}
-
-	return response, nil
+	return job, nil
 
 }
 
-func (service *jobServiceImpl) Create(requestBody []byte) (response model.CreateJobResponse, err error) {
+func (service *ServiceImpl) JobCreate(requestBody []byte) (response string, err error) {
 
-	request := &model.CreateJobRequest{}
+	request := &db.CreateJobParams{}
 	json.Unmarshal(requestBody, request)
 
 	if err := validation.JobCreateValidation(*request); err != nil {
-		return model.CreateJobResponse{}, err
+		return "", err
 	}
 
-	job := entity.Job{
-		JobTitle:          request.JobTitle,
-		JobType:           request.JobType,
-		JobFunction:       request.JobFunction,
-		Currency:          request.Currency,
-		Value:             request.Value,
-		SkillsId:          request.SkillsId,
-		JobApplicantIds:   request.JobApplicantIds,
-		JobApplicantCount: request.JobApplicantCount,
-		CompanyId:         request.CompanyId,
-		RecruiterId:       request.RecruiterId,
-		LocationId:        request.LocationId,
-	}
-
-	jobId, err := service.jobRepository.Insert(job)
+	err = service.postgres.CreateJob(context.Background(), *request)
 	if err != nil {
-		return model.CreateJobResponse{}, err
+		return "", err
 	}
 
-	return model.CreateJobResponse{JobId: jobId}, nil
+	// TODO: Return id here
+	return "", nil
 
 }

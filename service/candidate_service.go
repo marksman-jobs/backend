@@ -1,115 +1,50 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 
-	"github.com/marksman-jobs/backend/entity"
-	"github.com/marksman-jobs/backend/model"
-	"github.com/marksman-jobs/backend/repository"
+	"github.com/marksman-jobs/backend/db"
 	"github.com/marksman-jobs/backend/validation"
 )
 
-type candidateServiceImpl struct {
-	candidateRepository repository.CandidateRepository
-}
+func (service *ServiceImpl) CandidateList() (responses []db.Candidate, err error) {
 
-func NewCandidateService(candidateRepository *repository.CandidateRepository) CandidateService {
-	return &candidateServiceImpl{
-		candidateRepository: *candidateRepository,
-	}
-}
-
-func (service *candidateServiceImpl) List() (responses []model.GetCandidateResponse, err error) {
-
-	candidates, err := service.candidateRepository.FindAll()
+	candidates, err := service.postgres.ListCandidates(context.Background())
 
 	if err != nil {
-		return []model.GetCandidateResponse{}, err
+		return []db.Candidate{}, err
 	}
 
-	response := []model.GetCandidateResponse{}
-
-	for _, candidate := range candidates {
-		response = append(response, model.GetCandidateResponse{
-			FirstName:          candidate.FirstName,
-			LastName:           candidate.LastName,
-			CurrentCompanyId:   candidate.CurrentCompanyId,
-			CurrentRoleId:      candidate.CurrentRoleId,
-			CurrentLocationId:  candidate.CurrentLocationId,
-			DesiredLocationIds: candidate.DesiredLocationIds,
-			DesiredRoleId:      candidate.DesiredRoleId,
-			Email:              candidate.Email,
-			PasswordHash:       candidate.PasswordHash,
-			IsEmailVerified:    candidate.IsEmailVerified,
-			Pronouns:           candidate.Pronouns,
-			EducationId:        candidate.EducationId,
-			SkillsId:           candidate.SkillsId,
-			ResumeId:           candidate.ResumeId,
-		})
-	}
-
-	return response, nil
+	return candidates, nil
 }
 
-func (service *candidateServiceImpl) Get(candidateId string) (response model.GetCandidateResponse, err error) {
+func (service *ServiceImpl) CandidateGet(candidateId string) (response db.Candidate, err error) {
 
-	request := entity.Candidate{CandidateId: candidateId}
-
-	data, err := service.candidateRepository.Get(request)
+	candidate, err := service.postgres.GetCandidate(context.Background(), candidateId)
 	if err != nil {
-		return model.GetCandidateResponse{}, err
+		return db.Candidate{}, err
 	}
 
-	response = model.GetCandidateResponse{
-		FirstName:          data.FirstName,
-		LastName:           data.LastName,
-		CurrentCompanyId:   data.CurrentCompanyId,
-		CurrentRoleId:      data.CurrentRoleId,
-		CurrentLocationId:  data.CurrentLocationId,
-		DesiredLocationIds: data.DesiredLocationIds,
-		DesiredRoleId:      data.DesiredRoleId,
-		Email:              data.Email,
-		PasswordHash:       data.PasswordHash,
-		IsEmailVerified:    data.IsEmailVerified,
-		Pronouns:           data.Pronouns,
-		EducationId:        data.EducationId,
-		SkillsId:           data.SkillsId,
-		ResumeId:           data.ResumeId,
-	}
-	return model.GetCandidateResponse{}, nil
+	return candidate, nil
 
 }
 
-func (service *candidateServiceImpl) Create(requestBody []byte) (response model.CreateCandidateResponse, err error) {
+func (service *ServiceImpl) CandidateCreate(requestBody []byte) (response string, err error) {
 
-	request := &model.CreateCandidateRequest{}
+	request := &db.CreateCandidateParams{}
 	json.Unmarshal(requestBody, request)
 
 	if err := validation.CandidateCreateValidation(*request); err != nil {
-		return model.CreateCandidateResponse{}, err
+		return "", err
 	}
 
-	candidate := entity.Candidate{
-		FirstName:          request.FirstName,
-		LastName:           request.LastName,
-		CurrentCompanyId:   request.CurrentCompanyId,
-		CurrentRoleId:      request.CurrentRoleId,
-		CurrentLocationId:  request.CurrentLocationId,
-		DesiredLocationIds: request.DesiredLocationIds,
-		DesiredRoleId:      request.DesiredRoleId,
-		Email:              request.Email,
-		PasswordHash:       request.PasswordHash,
-		Pronouns:           request.Pronouns,
-		EducationId:        request.EducationId,
-		SkillsId:           request.SkillsId,
-		ResumeId:           request.ResumeId,
-	}
-
-	candidateId, err := service.candidateRepository.Insert(candidate)
+	err = service.postgres.CreateCandidate(context.Background(), *request)
 	if err != nil {
-		return model.CreateCandidateResponse{}, err
+		return "", err
 	}
 
-	return model.CreateCandidateResponse{CandidateId: candidateId}, nil
+	// TODO: Return id here
+	return "", nil
 
 }

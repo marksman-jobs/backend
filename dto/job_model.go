@@ -1,4 +1,4 @@
-package model
+package dto
 
 type CreateJobRequest struct {
 	JobTitle          string   `bun:"job_title"`

@@ -2,38 +2,21 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/marksman-jobs/backend/model"
-	"github.com/marksman-jobs/backend/service"
+	"github.com/marksman-jobs/backend/dto"
 )
 
-type CompanyController struct {
-	CompanyService service.CompanyService
-}
+func (controller *Controller) companyList(c *fiber.Ctx) error {
 
-func NewCompanyController(companyService *service.CompanyService) CompanyController {
-	return CompanyController{CompanyService: *companyService}
-}
-
-func (controller *CompanyController) Route(app *fiber.App) {
-
-	app.Get("/api/v1/company", controller.list)
-	app.Get("/api/v1/company/:id", controller.get)
-	app.Post("api/v1/company", controller.create)
-
-}
-
-func (controller *CompanyController) list(c *fiber.Ctx) error {
-
-	responses, err := controller.CompanyService.List()
+	responses, err := controller.Service.CompanyList()
 	if err != nil {
-		return c.JSON(model.WebResponse{
+		return c.JSON(dto.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
 		})
 	}
 
-	return c.JSON(model.WebResponse{
+	return c.JSON(dto.WebResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   responses,
@@ -41,19 +24,19 @@ func (controller *CompanyController) list(c *fiber.Ctx) error {
 
 }
 
-func (controller *CompanyController) get(c *fiber.Ctx) error {
+func (controller *Controller) companyGet(c *fiber.Ctx) error {
 
 	companyId := c.Params("id")
-	response, err := controller.CompanyService.Get(companyId)
+	response, err := controller.Service.CompanyGet(companyId)
 	if err != nil {
-		return c.JSON(model.WebResponse{
+		return c.JSON(dto.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
 		})
 	}
 
-	return c.JSON(model.WebResponse{
+	return c.JSON(dto.WebResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   response,
@@ -61,19 +44,19 @@ func (controller *CompanyController) get(c *fiber.Ctx) error {
 
 }
 
-func (controller *CompanyController) create(c *fiber.Ctx) error {
+func (controller *Controller) companyCreate(c *fiber.Ctx) error {
 
 	request := c.Body()
-	response, err := controller.CompanyService.Create(request)
+	response, err := controller.Service.CompanyCreate(request)
 	if err != nil {
-		return c.JSON(model.WebResponse{
+		return c.JSON(dto.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
 		})
 	}
 
-	return c.JSON(model.WebResponse{
+	return c.JSON(dto.WebResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   response,

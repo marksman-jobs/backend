@@ -32,3 +32,6 @@ go.work
 
 go.sum
 .vscode/
+.env
+
+!example.env

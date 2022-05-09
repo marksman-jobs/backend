@@ -1,0 +1,3 @@
+{
+    "postgres_uri": "postgres:///user@password:database?ssl_mode=disable"
+}

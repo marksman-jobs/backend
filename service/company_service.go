@@ -1,86 +1,42 @@
 package service
 
 import (
-	"encoding/json"
+	"context"
+	"database/sql"
 
-	"github.com/marksman-jobs/backend/entity"
-	"github.com/marksman-jobs/backend/model"
-	"github.com/marksman-jobs/backend/repository"
-	"github.com/marksman-jobs/backend/validation"
+	"github.com/marksman-jobs/backend/db"
 )
 
-type companyServiceImpl struct {
-	companyRepository repository.CompanyRepository
-}
+func (service *ServiceImpl) CompanyList() (responses []db.Company, err error) {
 
-func NewCompanyService(companyRepository *repository.CompanyRepository) CompanyService {
-	return &companyServiceImpl{
-		companyRepository: *companyRepository,
-	}
-}
-
-func (service *companyServiceImpl) List() (responses []model.GetCompanyResponse, err error) {
-
-	companies, err := service.companyRepository.FindAll()
+	companies, err := service.postgres.ListCompanies(context.Background())
 
 	if err != nil {
-		return []model.GetCompanyResponse{}, err
+		return []db.Company{}, err
 	}
 
-	response := []model.GetCompanyResponse{}
+	return companies, nil
+}
 
-	for _, company := range companies {
-		response = append(response, model.GetCompanyResponse{
-			CompanyId:          company.CompanyId,
-			LocationIds:        company.LocationIds,
-			CompanyDescription: company.CompanyDescription,
-		})
+func (service *ServiceImpl) CompanyGet(candidateId string) (response db.Company, err error) {
+
+	company, err := service.postgres.GetCompany(context.Background(), candidateId)
+	if err != nil {
+		return db.Company{}, err
 	}
 
-	return response, nil
+	return company, nil
 
 }
 
-func (service *companyServiceImpl) Get(companyId string) (response model.GetCompanyResponse, err error) {
+func (service *ServiceImpl) CompanyCreate(requestBody []byte) (response string, err error) {
 
-	request := entity.Company{
-		CompanyId: companyId,
-	}
-
-	request, err = service.companyRepository.Get(request)
+	err = service.postgres.CreateCompany(context.Background(), sql.NullString{String: string(requestBody), Valid: true})
 	if err != nil {
-		return model.GetCompanyResponse{}, nil
+		return "", err
 	}
 
-	response = model.GetCompanyResponse{
-		CompanyId:          request.CompanyId,
-		LocationIds:        request.LocationIds,
-		CompanyDescription: request.CompanyDescription,
-	}
-
-	return response, nil
-
-}
-
-func (service *companyServiceImpl) Create(requestBody []byte) (response model.CreateCompanyResponse, err error) {
-
-	request := &model.CreateCompanyRequest{}
-	json.Unmarshal(requestBody, request)
-
-	if err := validation.CompanyCreateValidation(*request); err != nil {
-		return model.CreateCompanyResponse{}, err
-	}
-
-	company := entity.Company{
-		LocationIds:        request.LocationIds,
-		CompanyDescription: request.CompanyDescription,
-	}
-
-	companyId, err := service.companyRepository.Insert(company)
-	if err != nil {
-		return model.CreateCompanyResponse{}, err
-	}
-
-	return model.CreateCompanyResponse{CompanyId: companyId}, nil
+	// TODO: Return id here
+	return "", nil
 
 }

@@ -7,12 +7,7 @@ import (
 )
 
 type Config struct {
-	MONGO_POOL_MIN             int
-	MONGO_POOL_MAX             int
-	MONGO_MAX_IDLE_TIME_SECOND int
-	MONGO_DATABASE             string
-	MONGO_URI                  string
-	POSTGRES_URI               string
+	POSTGRES_URI string `mapstructure:"postgres_uri"`
 }
 
 func InitializeConfig() *Config {

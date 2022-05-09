@@ -1,4 +1,4 @@
-package model
+package dto
 
 type CreateCompanyRequest struct {
 	LocationIds        []string `bun:"location_ids,fk,array"`

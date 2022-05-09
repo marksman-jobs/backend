@@ -1,4 +1,4 @@
-package model
+package dto
 
 type CreateCandidateRequest struct {
 	FirstName          string

@@ -2,38 +2,21 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/marksman-jobs/backend/model"
-	"github.com/marksman-jobs/backend/service"
+	"github.com/marksman-jobs/backend/dto"
 )
 
-type CandidateController struct {
-	CandidateService service.CandidateService
-}
+func (controller *Controller) candidateList(c *fiber.Ctx) error {
 
-func NewCandidateController(candidateService *service.CandidateService) CandidateController {
-	return CandidateController{CandidateService: *candidateService}
-}
-
-func (controller *CandidateController) Route(app *fiber.App) {
-
-	app.Get("/api/v1/candidates", controller.list)
-	app.Get("/api/v1/candidates/:id", controller.get)
-	app.Post("api/v1/candidates", controller.create)
-
-}
-
-func (controller *CandidateController) list(c *fiber.Ctx) error {
-
-	responses, err := controller.CandidateService.List()
+	responses, err := controller.Service.CandidateList()
 	if err != nil {
-		return c.JSON(model.WebResponse{
+		return c.JSON(dto.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
 		})
 	}
 
-	return c.JSON(model.WebResponse{
+	return c.JSON(dto.WebResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   responses,
@@ -41,19 +24,19 @@ func (controller *CandidateController) list(c *fiber.Ctx) error {
 
 }
 
-func (controller *CandidateController) get(c *fiber.Ctx) error {
+func (controller *Controller) candidateGet(c *fiber.Ctx) error {
 
 	candidateId := c.Params("id")
-	response, err := controller.CandidateService.Get(candidateId)
+	response, err := controller.Service.CandidateGet(candidateId)
 	if err != nil {
-		return c.JSON(model.WebResponse{
+		return c.JSON(dto.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
 		})
 	}
 
-	return c.JSON(model.WebResponse{
+	return c.JSON(dto.WebResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   response,
@@ -61,19 +44,19 @@ func (controller *CandidateController) get(c *fiber.Ctx) error {
 
 }
 
-func (controller *CandidateController) create(c *fiber.Ctx) error {
+func (controller *Controller) candidateCreate(c *fiber.Ctx) error {
 
 	request := c.Body()
-	response, err := controller.CandidateService.Create(request)
+	response, err := controller.Service.CandidateCreate(request)
 	if err != nil {
-		return c.JSON(model.WebResponse{
+		return c.JSON(dto.WebResponse{
 			Code:   500,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
 		})
 	}
 
-	return c.JSON(model.WebResponse{
+	return c.JSON(dto.WebResponse{
 		Code:   200,
 		Status: "OK",
 		Data:   response,
